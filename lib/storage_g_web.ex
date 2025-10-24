@@ -23,13 +23,10 @@ defmodule StorageGWeb do
     end
   end
 
-  # ⬇️ ВАЖНО: никаких Phoenix.HTML.Tag
   def html do
     quote do
       use Phoenix.Component
       import Phoenix.HTML
-
-      # import Phoenix.HTML.Form  # можно подключить, если где-то нужны form_* хелперы
       alias Phoenix.LiveView.JS, as: JS
       unquote(verified_routes())
     end
@@ -42,7 +39,6 @@ defmodule StorageGWeb do
 
       import Phoenix.Component
 
-      # НЕ импортируем Phoenix.LiveView.Helpers — в 0.20+ почти всё уже в Phoenix.Component
       alias Phoenix.LiveView.JS, as: JS
       unquote(verified_routes())
     end

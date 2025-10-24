@@ -1,0 +1,14 @@
+{
+  "scripts": {
+    "deploy": "esbuild js/app.js --bundle --minify --target=es2017 --outdir=../priv/static/assets && cd .. && mix phx.digest",
+    "build": "esbuild js/app.js --bundle --target=es2017 --outdir=../priv/static/assets",
+    "watch": "esbuild js/app.js --bundle --target=es2017 --sourcemap --outdir=../priv/static/assets --watch"
+  },
+  "dependencies": {
+    "esbuild": "^0.21.5",
+    "phoenix": "^1.7.21",
+    "phoenix_html": "^4.1.1",
+    "phoenix_live_view": "^0.20.17",
+    "topbar": "^2.0.1"
+  }
+}

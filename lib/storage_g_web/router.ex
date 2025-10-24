@@ -9,6 +9,7 @@ defmodule StorageGWeb.Router do
     plug :put_root_layout, {StorageGWeb.Layouts, :root}
     plug :protect_from_forgery
     plug :put_secure_browser_headers
+    plug StorageGWeb.Plugs.SaveKeyPlug
   end
 
   pipeline :api do
@@ -23,10 +24,9 @@ defmodule StorageGWeb.Router do
 
   scope "/", StorageGWeb do
     pipe_through :browser
-
-    live "/dashboard", DashboardLive, :index
-    live "/keys", ApiKeysLive, :index
-    live "/super", SuperDashboardLive, :index
+    live "/dashboard", DashboardLive
+    live "/keys", ApiKeysLive
+    live "/admin", AdminDashboardLive
   end
 
   scope "/api", StorageGWeb do
