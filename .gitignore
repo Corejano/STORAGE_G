@@ -26,3 +26,5 @@ erl_crash.dump
 storage_g-*.tar
 
 .env
+
+/uploads/
