@@ -1,0 +1,15 @@
+<!doctype html>
+<html lang="ru">
+<head>
+  <meta charset="utf-8" />
+  <meta name="csrf-token" content={Phoenix.Controller.get_csrf_token()} />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>StorageG</title>
+</head>
+<body>
+  <%= @inner_content %>
+
+  <!-- подключаем собранный JS -->
+  <script defer type="text/javascript" src={"/assets/app.js"}></script>
+</body>
+</html>
