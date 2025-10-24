@@ -103,7 +103,7 @@ defmodule StorageGWeb.DashboardLive do
   @impl true
   def render(assigns) do
     ~H"""
-    <div id="dashboard" class="p-6 max-w-7xl mx-auto bg-gradient-to-b from-gray-50 to-white rounded-xl shadow-xl">
+    <div id="dashboard" class="p-6 max-w-7xl mx-auto bg-linear-to-b from-gray-50 to-white rounded-xl shadow-xl">
       <h1 class="text-3xl font-bold mb-6 text-gray-800">📂 Storage Dashboard</h1>
 
       <div class="mb-4 text-gray-700">
@@ -151,7 +151,7 @@ defmodule StorageGWeb.DashboardLive do
             <%= for f <- current_page(@filtered, @page, @page_size) do %>
               <tr class="hover:bg-gray-50 border-t align-top">
                 <td class="p-3 font-medium text-gray-800"><%= f.filename %></td>
-                <td class="p-3 text-gray-600 max-w-[18rem] break-words">
+                <td class="p-3 text-gray-600 max-w-[18rem] wrap-break-word">
                   <%= if (f.description || "") == "" do %>
                     <span class="italic text-gray-400">—</span>
                   <% else %>
@@ -174,7 +174,7 @@ defmodule StorageGWeb.DashboardLive do
                     type="text"
                     value={link}
                     readonly
-                    class="w-[22rem] border rounded px-2 py-1 bg-gray-50 text-gray-800 text-xs"
+                    class="w-88 border rounded px-2 py-1 bg-gray-50 text-gray-800 text-xs"
                     onclick="this.select()"
                   />
                 </td>
