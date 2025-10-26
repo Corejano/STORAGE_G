@@ -10,13 +10,10 @@ defmodule StorageG.MixProject do
       start_permanent: Mix.env() == :prod,
       aliases: aliases(),
       deps: deps()
-      # listeners: [Phoenix.CodeReloader]
     ]
   end
 
-  # Configuration for the OTP application.
-  #
-  # Type `mix help compile.app` for more information.
+  # Конфигурация OTP приложения
   def application do
     [
       mod: {StorageG.Application, []},
@@ -24,19 +21,11 @@ defmodule StorageG.MixProject do
     ]
   end
 
-  def cli do
-    [
-      preferred_envs: [precommit: :test]
-    ]
-  end
-
-  # Specifies which paths to compile per environment.
+  # Пути для компиляции
   defp elixirc_paths(:test), do: ["lib", "test/support"]
   defp elixirc_paths(_), do: ["lib"]
 
-  # Specifies your project dependencies.
-  #
-  # Type `mix help deps` for examples and options.
+  # Зависимости проекта
   defp deps do
     [
       {:phoenix, "~> 1.7.14"},
@@ -56,23 +45,36 @@ defmodule StorageG.MixProject do
       {:bandit, "~> 1.5"},
       {:oban, "~> 2.17"},
       {:cors_plug, "~> 3.0"},
-      {:esbuild, "~> 0.8", runtime: Mix.env() == :dev}
+      # инструменты сборки фронтенда — только в dev
+      {:esbuild, "~> 0.8", runtime: Mix.env() == :dev},
+      {:tailwind, "~> 0.2", runtime: Mix.env() == :dev}
     ]
   end
 
-  # Aliases are shortcuts or tasks specific to the current project.
-  # For example, to install project dependencies and perform other setup tasks, run:
-  #
-  #     $ mix setup
-  #
-  # See the documentation for `Mix` for more info on aliases.
+  # Алиасы (в т.ч. для сборки ассетов)
   defp aliases do
     [
-      setup: ["deps.get", "ecto.setup"],
+      # стандартные команды для базы данных
+      setup: ["deps.get", "ecto.setup", "assets.setup"],
       "ecto.setup": ["ecto.create", "ecto.migrate", "run priv/repo/seeds.exs"],
       "ecto.reset": ["ecto.drop", "ecto.setup"],
       test: ["ecto.create --quiet", "ecto.migrate --quiet", "test"],
-      precommit: ["compile --warning-as-errors", "deps.unlock --unused", "format", "test"]
+      precommit: ["compile --warning-as-errors", "deps.unlock --unused", "format", "test"],
+
+      # команды для фронтенд ассетов
+      "assets.setup": [
+        "tailwind.install --if-missing",
+        "esbuild.install --if-missing"
+      ],
+      "assets.build": [
+        "tailwind default",
+        "esbuild default"
+      ],
+      "assets.deploy": [
+        "tailwind default --minify",
+        "esbuild default --minify",
+        "phx.digest"
+      ]
     ]
   end
 end
