@@ -1,6 +1,6 @@
 defmodule StorageGWeb.DashboardLive do
   @moduledoc """
-  Современный дашборд пользователя — таблица файлов с фильтром, сортировкой и пагинацией.
+  Дашборд пользователя — просмотр, поиск, копирование хэша и ссылки, а также просмотр файлов.
   """
 
   use StorageGWeb, :live_view
@@ -44,7 +44,7 @@ defmodule StorageGWeb.DashboardLive do
      assign(socket, :files, files) |> assign(:filtered, apply_filter_sort(socket, files))}
   end
 
-  # ——— handle_event: filter ———
+  # ——— фильтр ———
   @impl true
   def handle_event("filter", %{"q" => q}, socket) do
     {:noreply,
@@ -54,7 +54,7 @@ defmodule StorageGWeb.DashboardLive do
      |> assign(:filtered, apply_filter_sort(socket))}
   end
 
-  # ——— handle_event: sort ———
+  # ——— сортировка ———
   @impl true
   def handle_event("sort", %{"field" => field}, socket) do
     field_atom = String.to_existing_atom(field)
@@ -71,7 +71,7 @@ defmodule StorageGWeb.DashboardLive do
      |> assign(:filtered, apply_filter_sort(socket))}
   end
 
-  # ——— handle_event: pagination ———
+  # ——— пагинация ———
   @impl true
   def handle_event("page", %{"to" => dir}, socket) do
     new_page =
@@ -102,7 +102,7 @@ defmodule StorageGWeb.DashboardLive do
         <div class="flex flex-col items-start sm:items-end">
           <p class="text-gray-700 text-sm">Ваш API-ключ:</p>
           <code class="bg-white border border-gray-300 rounded px-2 py-1 text-gray-800 text-sm shadow-sm"><%= @api_key %></code>
-          <p class="text-xs text-gray-500 mt-1">Скопируйте ссылку из таблицы, чтобы использовать файл в других сервисах</p>
+          <p class="text-xs text-gray-500 mt-1">Вы можете копировать хэш или ссылку на файл</p>
         </div>
       </div>
 
@@ -131,34 +131,61 @@ defmodule StorageGWeb.DashboardLive do
       <!-- 📊 таблица -->
       <div class="overflow-x-auto w-full rounded-lg shadow border border-gray-200">
         <table class="min-w-full text-sm text-left border-collapse">
-          <thead class="bg-linear-to-r from-blue-500 to-blue-600 text-white uppercase text-xs tracking-wider">
+          <thead class="bg-gradient-to-r from-blue-500 to-blue-600 text-white uppercase text-xs tracking-wider">
             <tr>
-              <th class="p-3 w-[22%] cursor-pointer text-left" phx-click="sort" phx-value-field="filename">Имя файла</th>
-              <th class="p-3 w-[28%] text-left">Описание</th>
-              <th class="p-3 w-[10%] cursor-pointer text-left" phx-click="sort" phx-value-field="size">Размер</th>
-              <th class="p-3 w-[12%] text-left">Тип</th>
-              <th class="p-3 w-[15%] cursor-pointer text-left" phx-click="sort" phx-value-field="inserted_at">Дата</th>
-              <th class="p-3 w-[20%] text-left">Ссылка</th>
+              <th class="p-3 w-[16%] cursor-pointer text-left" phx-click="sort" phx-value-field="filename">Имя файла</th>
+              <th class="p-3 w-[20%] text-left">Описание</th>
+              <th class="p-3 w-[8%] cursor-pointer text-left" phx-click="sort" phx-value-field="size">Размер</th>
+              <th class="p-3 w-[10%] text-left">Тип</th>
+              <th class="p-3 w-[12%] cursor-pointer text-left" phx-click="sort" phx-value-field="inserted_at">Дата</th>
+              <th class="p-3 w-[14%] text-left">Хэш</th>
+              <th class="p-3 w-[14%] text-left">Ссылка</th>
+              <th class="p-3 w-[6%] text-center">Действие</th>
             </tr>
           </thead>
 
           <tbody class="bg-white divide-y divide-gray-100">
             <%= for f <- current_page(@filtered, @page, @page_size) do %>
+              <% link = "#{@host}/api/file/#{f.id}?key=#{@api_key}" %>
               <tr class="hover:bg-blue-50 transition">
                 <td class="p-3 truncate font-medium text-gray-900" title={f.filename}><%= f.filename %></td>
                 <td class="p-3 truncate text-gray-600" title={f.description}><%= f.description || "—" %></td>
                 <td class="p-3 whitespace-nowrap text-gray-600"><%= format_size(f.size) %></td>
                 <td class="p-3 whitespace-nowrap text-gray-600"><%= f.mime_type %></td>
                 <td class="p-3 whitespace-nowrap text-gray-600"><%= f.inserted_at %></td>
-                <td class="p-3">
-                  <% link = "#{@host}/api/file/#{f.id}?key=#{@api_key}" %>
+
+                <!-- Хэш -->
+                <td class="p-3 text-gray-700">
+                  <%= if f.hash do %>
+                    <input
+                      type="text"
+                      value={f.hash}
+                      readonly
+                      class="w-full border border-gray-300 rounded-md px-2 py-1 text-xs bg-gray-50 text-gray-700 cursor-pointer hover:bg-white"
+                      onclick="this.select()"
+                    />
+                  <% else %>
+                    <span class="italic text-gray-400">pending</span>
+                  <% end %>
+                </td>
+
+                <!-- Ссылка -->
+                <td class="p-3 text-gray-700">
                   <input
                     type="text"
                     value={link}
                     readonly
-                    class="w-full border border-gray-300 rounded-md px-2 py-1 text-xs bg-gray-50 text-gray-700 hover:bg-white cursor-pointer"
+                    class="w-full border border-gray-300 rounded-md px-2 py-1 text-xs bg-gray-50 text-gray-700 cursor-pointer hover:bg-white"
                     onclick="this.select()"
                   />
+                </td>
+
+                <!-- Кнопка -->
+                <td class="p-3 text-center">
+                  <a href={link} target="_blank"
+                    class="inline-flex items-center justify-center px-2 py-1 text-xs font-medium text-white bg-blue-600 rounded hover:bg-blue-700 transition">
+                    👁 Смотреть
+                  </a>
                 </td>
               </tr>
             <% end %>
@@ -166,7 +193,6 @@ defmodule StorageGWeb.DashboardLive do
         </table>
       </div>
 
-      <!-- нижняя панель -->
       <div class="text-sm text-gray-500 mt-6 text-center">
         Всего файлов: <%= length(@files) %>
       </div>
