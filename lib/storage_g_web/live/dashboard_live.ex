@@ -9,6 +9,7 @@ defmodule StorageGWeb.DashboardLive do
   @topic "files:updates"
   @page_size 10
 
+  # ——— mount ———
   @impl true
   def mount(params, _session, socket) do
     case authorize(params["key"]) do
@@ -34,6 +35,7 @@ defmodule StorageGWeb.DashboardLive do
     end
   end
 
+  # ——— handle_info ———
   @impl true
   def handle_info({:new_file, file}, socket) do
     files = [file | socket.assigns.files]
@@ -42,6 +44,7 @@ defmodule StorageGWeb.DashboardLive do
      assign(socket, :files, files) |> assign(:filtered, apply_filter_sort(socket, files))}
   end
 
+  # ——— handle_event: filter ———
   @impl true
   def handle_event("filter", %{"q" => q}, socket) do
     {:noreply,
@@ -51,6 +54,7 @@ defmodule StorageGWeb.DashboardLive do
      |> assign(:filtered, apply_filter_sort(socket))}
   end
 
+  # ——— handle_event: sort ———
   @impl true
   def handle_event("sort", %{"field" => field}, socket) do
     field_atom = String.to_existing_atom(field)
@@ -67,6 +71,7 @@ defmodule StorageGWeb.DashboardLive do
      |> assign(:filtered, apply_filter_sort(socket))}
   end
 
+  # ——— handle_event: pagination ———
   @impl true
   def handle_event("page", %{"to" => dir}, socket) do
     new_page =
@@ -83,16 +88,26 @@ defmodule StorageGWeb.DashboardLive do
     {:noreply, assign(socket, :page, new_page)}
   end
 
+  # ——— render ———
   @impl true
   def render(assigns) do
     ~H"""
-    <div id="dashboard" class="max-w-[95vw] mx-auto bg-white rounded-xl shadow-md border border-gray-200 p-8">
-      <h1 class="text-3xl font-semibold mb-10 text-gray-800 flex items-center gap-2">
-        📁 Мои файлы
-      </h1>
+    <div id="dashboard" class="max-w-7xl mx-auto bg-white rounded-2xl shadow-lg border border-gray-100 p-10 space-y-8">
+      <!-- 🔹 Инфо-блок -->
+      <div class="bg-blue-50 border border-blue-200 rounded-xl p-5 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
+        <div>
+          <p class="text-gray-700 text-sm">Вы вошли как:</p>
+          <p class="text-lg font-semibold text-gray-900"><%= @owner %></p>
+        </div>
+        <div class="flex flex-col items-start sm:items-end">
+          <p class="text-gray-700 text-sm">Ваш API-ключ:</p>
+          <code class="bg-white border border-gray-300 rounded px-2 py-1 text-gray-800 text-sm shadow-sm"><%= @api_key %></code>
+          <p class="text-xs text-gray-500 mt-1">Скопируйте ссылку из таблицы, чтобы использовать файл в других сервисах</p>
+        </div>
+      </div>
 
       <!-- 🔍 панель фильтра и пагинации -->
-      <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 mb-8 pb-5 border-b border-gray-200">
+      <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 pb-4 border-b border-gray-200">
         <input
           type="text"
           name="q"
@@ -114,8 +129,8 @@ defmodule StorageGWeb.DashboardLive do
       </div>
 
       <!-- 📊 таблица -->
-      <div class="overflow-x-auto w-full rounded-lg shadow-sm border border-gray-200">
-        <table class="min-w-full w-full text-sm text-left border-collapse">
+      <div class="overflow-x-auto w-full rounded-lg shadow border border-gray-200">
+        <table class="min-w-full text-sm text-left border-collapse">
           <thead class="bg-linear-to-r from-blue-500 to-blue-600 text-white uppercase text-xs tracking-wider">
             <tr>
               <th class="p-3 w-[22%] cursor-pointer text-left" phx-click="sort" phx-value-field="filename">Имя файла</th>
@@ -126,6 +141,7 @@ defmodule StorageGWeb.DashboardLive do
               <th class="p-3 w-[20%] text-left">Ссылка</th>
             </tr>
           </thead>
+
           <tbody class="bg-white divide-y divide-gray-100">
             <%= for f <- current_page(@filtered, @page, @page_size) do %>
               <tr class="hover:bg-blue-50 transition">
@@ -150,10 +166,9 @@ defmodule StorageGWeb.DashboardLive do
         </table>
       </div>
 
-      <!-- ⚙️ нижняя панель -->
-      <div class="flex justify-end items-center mt-10 gap-4">
-        <button class="px-5 py-1.5 border border-blue-600 text-blue-600 rounded-lg hover:bg-blue-50 transition">Редактировать</button>
-        <button class="px-5 py-1.5 border border-red-500 text-red-600 rounded-lg hover:bg-red-50 transition">Удалить</button>
+      <!-- нижняя панель -->
+      <div class="text-sm text-gray-500 mt-6 text-center">
+        Всего файлов: <%= length(@files) %>
       </div>
     </div>
     """

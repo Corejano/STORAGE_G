@@ -24,7 +24,10 @@ config :storage_g, StorageGWeb.Endpoint,
   code_reloader: true,
   debug_errors: true,
   secret_key_base: "ppFcK+dyOFvICZVq5Yc5ELgqz1b1zsslsMpXDYKmsWB0GLsg5prxK43TbbZ8j5aF",
-  watchers: []
+  watchers: [
+    esbuild: {Esbuild, :install_and_run, [:default, ~w(--sourcemap=inline --watch)]},
+    tailwind: {Tailwind, :install_and_run, [:default, ~w(--watch)]}
+  ]
 
 # ## SSL Support
 #
@@ -44,7 +47,25 @@ config :storage_g, StorageGWeb.Endpoint,
 #       keyfile: "priv/cert/selfsigned_key.pem",
 #       certfile: "priv/cert/selfsigned.pem"
 #     ],
-#
+config :esbuild,
+  version: "0.21.5",
+  default: [
+    args: ~w(js/app.js --bundle --target=es2017 --outdir=../priv/static/assets),
+    cd: Path.expand("../assets", __DIR__),
+    env: %{"NODE_PATH" => Path.expand("../deps", __DIR__)}
+  ]
+
+config :tailwind,
+  version: "3.3.3",
+  default: [
+    args: ~w(
+      --config=tailwind.config.js
+      --input=css/app.css
+      --output=../priv/static/assets/app.css
+    ),
+    cd: Path.expand("../assets", __DIR__)
+  ]
+
 # If desired, both `http:` and `https:` keys can be
 # configured to run both http and https servers on
 # different ports.

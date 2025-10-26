@@ -57,21 +57,21 @@ config :storage_g, StorageG.Uploads,
   # 500 МБ — бизнес-лимит API (можно менять)
   max_file_size: 500_000_000
 
-config :esbuild,
-  version: "0.21.5",
-  default: [
-    args: ~w(js/app.js --bundle --target=es2017 --outdir=../priv/static/assets),
-    cd: Path.expand("../assets", __DIR__),
-    env: %{"NODE_PATH" => Path.expand("../deps", __DIR__)}
-  ]
+# config :esbuild,
+#   version: "0.21.5",
+#   default: [
+#     args: ~w(js/app.js --bundle --target=es2017 --outdir=../priv/static/assets),
+#     cd: Path.expand("../assets", __DIR__),
+#     env: %{"NODE_PATH" => Path.expand("../deps", __DIR__)}
+#   ]
 
-config :tailwind,
-  version: "3.3.3",
-  default: [
-    args: ~w(
-      --config=tailwind.config.js
-      --input=css/app.css
-      --output=../priv/static/assets/app.css
-    ),
-    cd: Path.expand("../assets", __DIR__)
-  ]
+# config :tailwind,
+#   version: "3.3.3",
+#   default: [
+#     args: ~w(
+#       --config=tailwind.config.js
+#       --input=css/app.css
+#       --output=../priv/static/assets/app.css
+#     ),
+#     cd: Path.expand("../assets", __DIR__)
+#   ]
