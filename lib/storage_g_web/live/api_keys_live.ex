@@ -97,7 +97,7 @@ defmodule StorageGWeb.ApiKeysLive do
   defp current_host do
     case Application.get_env(:storage_g, StorageGWeb.Endpoint)[:url] do
       %{host: host, port: port, scheme: scheme} -> "#{scheme}://#{host}:#{port}"
-      _ -> "http://localhost:4000"
+      _ -> "http://http://localhost:4000"
     end
   end
 
@@ -129,7 +129,7 @@ defmodule StorageGWeb.ApiKeysLive do
             <th class="p-2 text-left">Владелец</th>
             <th class="p-2">Ключ</th>
             <th class="p-2">Активен</th>
-            <th class="p-2">Хост</th>
+            <th class="p-2">Ссылка</th>
             <th class="p-2">Роль</th>
             <th class="p-2 text-center">Действия</th>
           </tr>
@@ -140,7 +140,13 @@ defmodule StorageGWeb.ApiKeysLive do
               <td class="p-2 font-semibold"><%= k.owner %></td>
               <td class="p-2 text-xs break-all"><%= k.key %></td>
               <td class="p-2 text-center"><%= if k.active, do: "✅", else: "❌" %></td>
-              <td class="p-2"><%= k.host %></td>
+              <td class="p-2 text-xs break-all">
+                <% link = "#{k.host}/dashboard?key=#{k.key}" %>
+                <a href={link} target="_blank" class="text-blue-600 underline hover:text-blue-800">
+                  <%= link %>
+                </a>
+              </td>
+
               <td class="p-2"><%= k.role %></td>
               <td class="p-2 flex gap-2 justify-center">
                 <button phx-click="toggle" phx-value-id={k.id}
